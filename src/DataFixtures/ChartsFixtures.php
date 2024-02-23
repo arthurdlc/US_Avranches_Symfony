@@ -41,7 +41,7 @@ class ChartsFixtures extends Fixture
         $headConfig = new ChartConfiguration();
         $headConfig->setChartType('line');
         $headConfig->setName('Jongle tete');
-        $headConfig->setConfigData(['entity' => 'App\Entity\Tests', 'min' => 100, 'max' => 200, 'field' => 'jongletete']);
+        $headConfig->setConfigData(['entity' => 'App\Entity\Tests', 'min' => 0, 'max' => 50, 'field' => 'jongletete']);
         $manager->persist($headConfig);
 
         $controlConfig = new ChartConfiguration();
