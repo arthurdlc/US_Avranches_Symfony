@@ -7,7 +7,8 @@
     canvas{
         margin-left : 10%;
         margin-right : 10%;
-        margin-bottom : 10%;
+        margin-bottom : 1%;
+        margin-top : 2%;
     }
 </style>
 <script>
@@ -18,9 +19,50 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="accordion">
 {% for chartId, chartData in chartData %}
-
-    <h5 style="color:white;">{{ chartData.name }}</h5>
     <canvas id="canvas{{ chartId }}" width="50%" style="background-color : white;"></canvas>
+    <center>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalchart{{ chartId }}" data-bs-whatever="@mdo">modifier l'echelle du graphe </button>
+    <div class="modal fade" id="modalchart{{ chartId }}" tabindex="-1" aria-labelledby="modalchart{{ chartId }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalchart{{ chartId }}">Modification de l'echelle du graphe {{ chartData.name }}</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="background-color: white;">
+            <form>
+            <div class="mb-3" style=" color: black; ">
+                <label for="echellemin" class="col-form-label">Echelle Min:</label>
+                <input type="number" class="form-control" id="echellemin" value="0" name="NewMin">
+            </div>
+            <div class="mb-3">
+                <label for="echellemax" class="col-form-label">Echelle Max:</label>
+                <input type="number" class="form-control" id="echellemax" value="0" name="NewMax">
+            </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-primary">Appliquer</button>
+        </div>
+        </div>
+    </div>
+    </div>
+</center>
+<script>
+    const modalchart{{ chartId }} = document.getElementById('modalchart{{ chartId }}');
+    if (modalchart{{ chartId }}) {
+        modalchart{{ chartId }}.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            const recipient = button.getAttribute('data-bs-whatever');
+            const modalTitle = modalchart{{ chartId }}.querySelector('.modal-title');
+            const modalBodyInput = modalchart{{ chartId }}.querySelector('.modal-body input');
+        })
+    }
+</script>
+{#  fin du pop up #}
+{# fin de ala modification des echelles #}
+
     <script>
         const ctx{{ chartId }} = document.getElementById('canvas{{ chartId }}');
         const configData{{ chartId }} = {{ chartData.data | json_encode | raw }};
@@ -35,7 +77,6 @@
                     else if (value <= ({{ chartData.max }} - {{ chartData.min }}) / 3 ) {   return 'red';   }
                     else                                                                {   return 'orange';}
                 }         
-
         });
         
         let borderColor{{ chartId }} = "";
@@ -44,8 +85,6 @@
         }else{
             borderColor{{ chartId }} =  ctx{{ chartId }} => up(ctx{{ chartId }}, 'green') || down(ctx{{ chartId }}, 'red') || equal(ctx{{ chartId }}, 'orange');
         }
-
-
 
         new Chart(ctx{{ chartId }}, {
             type: '{{ chartData.chartType }}',
@@ -70,7 +109,7 @@
                         min: {{ chartData.min }},
                         max: {{ chartData.max }},
                         grid:{
-                            color :'rgba(0,0,0,0.5)'
+                            color :'rgba(0,0,0,0.6)'
                         },
                         title: {
                         color: 'black',
@@ -80,7 +119,7 @@
                     },
                     x: {
                         grid:{
-                            color :'rgba(0,0,0,0.5)',
+                            color :'rgba(0,0,0,0.6)',
                         },
                         title: {
                         color: 'black',
