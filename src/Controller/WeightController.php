@@ -44,6 +44,7 @@ class WeightController extends AbstractController
         return $this->renderForm('weight/new.html.twig', [
             'weight' => $weight,
             'form' => $form,
+            'location' => 'b',
         ]);
     }
 

@@ -21,7 +21,7 @@
 {% for chartId, chartData in chartData %}
     <canvas id="canvas{{ chartId }}" width="50%" style="background-color : white;"></canvas>
     <center>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalchart{{ chartId }}" data-bs-whatever="@mdo">modifier l'echelle du graphe </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalchart{{ chartId }}" data-bs-whatever="@mdo" data-chart-id="{{ chartId }}" data-min="{{ chartData.min }}" data-max="{{ chartData.max }}">Modifier l'échelle du graphe</button>
     <div class="modal fade" id="modalchart{{ chartId }}" tabindex="-1" aria-labelledby="modalchart{{ chartId }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -33,11 +33,11 @@
             <form>
             <div class="mb-3" style=" color: black; ">
                 <label for="echellemin" class="col-form-label">Echelle Min:</label>
-                <input type="number" class="form-control" id="echellemin" value="0" name="NewMin">
+                <input type="number" class="form-control" id="echellemin" value="{{ chartData.min }}" name="NewMin">
             </div>
             <div class="mb-3">
                 <label for="echellemax" class="col-form-label">Echelle Max:</label>
-                <input type="number" class="form-control" id="echellemax" value="0" name="NewMax">
+                <input type="number" class="form-control" id="echellemax" value="{{ chartData.max }}" name="NewMax">
             </div>
             </form>
         </div>
@@ -69,8 +69,8 @@
         const colors{{ chartId }} = configData{{ chartId }}.values.map((value, index) => {
             const previousValue = configData{{ chartId }}.values[index - 1];
                 if ({{ chartId }} === 6 || {{ chartId }} === 10){
-                    if (value >= (({{ chartData.max }} - {{ chartData.min }}) / 3) * 2) {   return 'red';   }
-                    else if (value >= ({{ chartData.max }} - {{ chartData.min }}) / 3 ) {   return 'green'; }
+                    if (value >= (({{ chartData.max }} - {{ chartData.min }}) / 3) * 2) {   return 'red'; } 
+                    else if (value <= ({{ chartData.max }} - {{ chartData.min }}) / 3 ) {   return 'green';   }
                     else                                                                {   return 'orange';}
                 }else{
                     if (value >= (({{ chartData.max }} - {{ chartData.min }}) / 3) * 2) {   return 'green'; } 
@@ -78,7 +78,7 @@
                     else                                                                {   return 'orange';}
                 }         
         });
-        
+        // ca c'est pour le segment 
         let borderColor{{ chartId }} = "";
         if ({{ chartId }} === 6 ||{{ chartId }} === 10) {
             borderColor{{ chartId }} = ctx{{ chartId }} => up(ctx{{ chartId }}, 'red') || down(ctx{{ chartId }}, 'green') || equal(ctx{{ chartId }}, 'orange');
@@ -95,7 +95,7 @@
                     data: configData{{ chartId }}.values,
                     borderColor: colors{{ chartId }}, // Utilisez la liste de couleurs déterminée précédemment
                     backgroundColor : colors{{ chartId }},
-                    borderWidth: 3,
+                    borderWidth: 2.5,
                     segment: {
                         borderColor: borderColor{{ chartId }}, 
                     },
