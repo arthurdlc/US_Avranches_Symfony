@@ -22,67 +22,88 @@
     <canvas id="canvas{{ chartId }}" width="50%" style="background-color : white;"></canvas>
     <center>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalchart{{ chartId }}" data-bs-whatever="@mdo" data-chart-id="{{ chartId }}" data-min="{{ chartData.min }}" data-max="{{ chartData.max }}">Modifier l'échelle du graphe</button>
+    </center>
+    <form id="updateScaleForm{{ chartId }}" action="{{ path('app_charts_update') }}" method="GET">
     <div class="modal fade" id="modalchart{{ chartId }}" tabindex="-1" aria-labelledby="modalchart{{ chartId }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
         <div class="modal-header">
-            <h1 class="modal-title fs-5" id="modalchart{{ chartId }}">Modification de l'echelle du graphe {{ chartData.name }}</h1>
+            <h1 class="modal-title fs-5" id="modalchart{{ chartId }}">Modification de l'échelle du graphe {{ chartData.name }}</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" style="background-color: white;">
             <form>
             <div class="mb-3" style=" color: black; ">
                 <label for="echellemin" class="col-form-label">Echelle Min:</label>
-                <input type="number" class="form-control" id="echellemin" value="{{ chartData.min }}" name="NewMin">
+                <input type="number" class="form-control" id="echellemin{{ chartId }}" value="{{ chartData.min }}" name="NewMin">
             </div>
             <div class="mb-3">
                 <label for="echellemax" class="col-form-label">Echelle Max:</label>
-                <input type="number" class="form-control" id="echellemax" value="{{ chartData.max }}" name="NewMax">
+                <input type="number" class="form-control" id="echellemax{{ chartId }}" value="{{ chartData.max }}" name="NewMax">
             </div>
             </form>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary">Appliquer</button>
+            <button type="submit" class="btn btn-primary" form="updateScaleForm{{ chartId }}">Appliquer</button>
         </div>
         </div>
     </div>
     </div>
-</center>
-<script>
-    const modalchart{{ chartId }} = document.getElementById('modalchart{{ chartId }}');
-    if (modalchart{{ chartId }}) {
-        modalchart{{ chartId }}.addEventListener('show.bs.modal', event => {
-            const button = event.relatedTarget;
-            const recipient = button.getAttribute('data-bs-whatever');
-            const modalTitle = modalchart{{ chartId }}.querySelector('.modal-title');
-            const modalBodyInput = modalchart{{ chartId }}.querySelector('.modal-body input');
-        })
-    }
-</script>
-{#  fin du pop up #}
-{# fin de ala modification des echelles #}
+    </form>
 
+    {# JavaScript pour le traitement AJAX #}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#updateScaleForm{{ chartId }}').submit(function(event) {
+                event.preventDefault(); // Empêcher le rechargement de la page
+
+                var formData = {
+                    min: $('#echellemin{{ chartId }}').val(),
+                    max: $('#echellemax{{ chartId }}').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: formData,
+                    success: function(response) {
+                        // Réaction à la réponse du contrôleur
+                        console.log(response);
+                        // Fermer le modal
+                        $('#modalchart{{ chartId }}').modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
+    {# Fin du script AJAX #}
+
+    {# JavaScript pour l'initialisation du graphique #}
     <script>
         const ctx{{ chartId }} = document.getElementById('canvas{{ chartId }}');
         const configData{{ chartId }} = {{ chartData.data | json_encode | raw }};
         const colors{{ chartId }} = configData{{ chartId }}.values.map((value, index) => {
             const previousValue = configData{{ chartId }}.values[index - 1];
-                if ({{ chartId }} === 6 || {{ chartId }} === 10){
-                    if (value >= (({{ chartData.max }} - {{ chartData.min }}) / 3) * 2) {   return 'red'; } 
-                    else if (value <= ({{ chartData.max }} - {{ chartData.min }}) / 3 ) {   return 'green';   }
-                    else                                                                {   return 'orange';}
-                }else{
-                    if (value >= (({{ chartData.max }} - {{ chartData.min }}) / 3) * 2) {   return 'green'; } 
-                    else if (value <= ({{ chartData.max }} - {{ chartData.min }}) / 3 ) {   return 'red';   }
-                    else                                                                {   return 'orange';}
-                }         
+            if ({{ chartId }} === 6 || {{ chartId }} === 10) {
+                if (value >= ({{ chartData.min }} + (({{ chartData.max }} - {{ chartData.min }}) / 3) * 2)) { return 'red'; } 
+                else if (value <= ({{ chartData.min }} + ({{ chartData.max }} - {{ chartData.min }}) / 3) ) { return 'green'; }
+                else { return 'orange'; }
+            } else {
+                if (value >= (({{ chartData.max }} - {{ chartData.min }}) / 3) * 2) { return 'green'; } 
+                else if (value <= ({{ chartData.max }} - {{ chartData.min }}) / 3 ) { return 'red'; }
+                else { return 'orange'; }
+            }
         });
         // ca c'est pour le segment 
         let borderColor{{ chartId }} = "";
         if ({{ chartId }} === 6 ||{{ chartId }} === 10) {
             borderColor{{ chartId }} = ctx{{ chartId }} => up(ctx{{ chartId }}, 'red') || down(ctx{{ chartId }}, 'green') || equal(ctx{{ chartId }}, 'orange');
-        }else{
+        } else {
             borderColor{{ chartId }} =  ctx{{ chartId }} => up(ctx{{ chartId }}, 'green') || down(ctx{{ chartId }}, 'red') || equal(ctx{{ chartId }}, 'orange');
         }
 
@@ -95,7 +116,7 @@
                     data: configData{{ chartId }}.values,
                     borderColor: colors{{ chartId }}, // Utilisez la liste de couleurs déterminée précédemment
                     backgroundColor : colors{{ chartId }},
-                    borderWidth: 2.5,
+                    borderWidth: 3,
                     segment: {
                         borderColor: borderColor{{ chartId }}, 
                     },
@@ -131,6 +152,8 @@
             }
         });
     </script>
+    {# Fin du script d'initialisation du graphique #}
+
 {% endfor %}
 </div>
 {% endblock %}
