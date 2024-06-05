@@ -33,7 +33,7 @@ class ChartsController extends AbstractController
         $this->weightVerificationService = $weightVerificationService; 
     }
     
-    #[Route('/details', name: 'app_charts_details', methods: ['GET'])]
+    #[Route('/details', name: 'app_charts_details')]
     public function index(ChartConfigurationRepository $configRepository, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
@@ -96,7 +96,7 @@ class ChartsController extends AbstractController
             }
     }
 
-    #[Route('/', name: 'app_charts_index', methods: ['GET'])]
+    #[Route('/', name: 'app_charts_index')]
     public function test(ChartConfigurationRepository $configRepository, EntityManagerInterface $entityManager, PalierRepository $palierRepository): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
@@ -252,7 +252,7 @@ class ChartsController extends AbstractController
         return $lastSixRecords;
     }
     
-    #[Route('/updatescale', name: 'app_charts_update_scale', methods: ['POST'])]
+    #[Route('/updatescale', name: 'app_charts_update_scale')]
     public function updateChartScale(Request $request, EntityManagerInterface $entityManager): Response 
     {
         // Récupérer l'ID du graphique et les nouvelles valeurs d'échelle du formulaire
@@ -285,7 +285,7 @@ class ChartsController extends AbstractController
  
     }
 
-    #[Route('/updatepalier', name: 'app_charts_update_palier', methods: ['POST'])]
+    #[Route('/updatepalier', name: 'app_charts_update_palier')]
     public function updateChartPalier(Request $request, EntityManagerInterface $entityManager): Response
     {
         // Récupérer l'ID du graphique et les nouvelles valeurs d'échelle du formulaire
